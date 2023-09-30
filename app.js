@@ -6,12 +6,14 @@ var logger = require("morgan");
 
 var mongoose = require("mongoose");
 var session = require("express-session");
+
 var MongoStore = require("connect-mongo");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var authRouter = require("./routes/auth");
 var roomsRouter = require("./routes/rooms");
+var reviewsRouter = require("./routes/reviews");
 
 var app = express();
 
@@ -49,10 +51,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/", indexRouter);
+const dynamicNav = require("./middleware/dynamicNav");
+
+app.use("/", dynamicNav, indexRouter);
 app.use("/users", usersRouter);
 app.use("/auth", authRouter);
 app.use("/rooms", roomsRouter);
+app.use("/reviews", reviewsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -73,10 +78,12 @@ app.use(function (err, req, res, next) {
 mongoose
   .connect(process.env.MONGODB_URI)
   .then((x) => {
-    console.log(`Connected to Mongo database: "${x.connections[0].name}"`);
+    console.log(
+      `Connected to Mongo! Database name: "${x.connections[0].name}"`
+    );
   })
   .catch((err) => {
-    console.log(`An error occurred while connecting to the Database: ${err}`);
+    console.error("Error connecting to mongo: ", err);
   });
 
 module.exports = app;

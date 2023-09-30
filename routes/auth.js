@@ -11,12 +11,14 @@ router.get("/signup", (req, res, next) => {
 });
 
 router.post("/signup", (req, res, next) => {
+  // console.log("The form data: ", req.body);
+
   const { fullName, email, password } = req.body;
 
   if (!fullName || !email || !password) {
     res.render("auth/signup.hbs", {
       errorMessage:
-        "All fields are mandatory. Please provide your username, email and password.",
+        "All fields are mandatory. Please provide your full name, email and password.",
     });
     return;
   }
@@ -85,10 +87,11 @@ router.post("/login", (req, res, next) => {
       } else if (bcryptjs.compareSync(password, user.password)) {
         req.session.user = user;
         console.log("Session after success ===>", req.session);
+
         res.redirect("/users/profile");
       } else {
         console.log("Incorrect password. ");
-        res.render("auth/login", {
+        res.render("auth/login.hbs", {
           errorMessage: "User not found and/or incorrect password.",
         });
       }
